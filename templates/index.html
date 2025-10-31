@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}首页{% endblock %}
+
+{% block content %}
+<style>
+    /* Desktop styles */
+    .name-col, .location-col, .contact-col, .details-col {
+        white-space: normal;
+        min-width: 150px;
+    }
+    .details-col {
+        min-width: 250px;
+    }
+    .details-content {
+        max-height: 3em; /* Approx. 2 lines */
+        overflow-y: auto;
+    }
+    .col-method, .col-photo, .col-owner {
+        /* Prevent these specific columns from wrapping on desktop */
+        white-space: nowrap;
+    }
+
+    /* Mobile styles: Apply only to screens 768px or narrower */
+    @media (max-width: 768px) {
+        .table td, .table th {
+            /* On small screens, prevent all wrapping and enable table scrolling */
+            white-space: nowrap;
+        }
+    }
+</style>
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a href="{{ url_for('download_excel') }}" class="btn btn-success mr-2">下载清单</a>
+        <a href="{{ url_for('add') }}" class="btn btn-primary">发布闲置</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th class="name-col">名称</th>
+                <th class="col-owner">所有者</th>
+                <th class="col-photo">照片</th>
+                <th class="col-method">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="methodDropdownLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            方式
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="methodDropdownLink">
+                            <a class="dropdown-item" href="#" onclick="filterByMethod(null)">全部</a>
+                            {% for method in sharing_methods %}
+                            <a class="dropdown-item" href="#" onclick="filterByMethod('{{ method.name }}')">{{ method.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </th>
+                <th class="location-col">位置</th>
+                <th class="contact-col">联系方式</th>
+                <th class="details-col">详情</th>
+                {% if g.user %}
+                    <th>操作</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td class="name-col"><div class="details-content">{{ item['name'] }}</div></td>
+                <td class="col-owner">{{ item['owner'] }}</td>
+                <td class="col-photo">
+                    {% if item['thumbnail'] %}
+                        <a href="#" data-toggle="modal" data-target="#imageModal" data-imgsrc="{{ url_for('static', filename='uploads/' + item['thumbnail']) }}">查看</a>
+                    {% endif %}
+                </td>
+                <td class="col-method">
+                    {% if g.user and g.user['username'] == item['owner'] %}
+                        <select name="method" class="form-control form-control-sm" onchange="updateMethod({{ item['id'] }}, this.value)">
+                            {% for method in sharing_methods %}
+                            <option value="{{ method.name }}" {% if item['method'] == method.name %}selected{% endif %}>{{ method.name }}</option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        {{ item['method'] }}
+                    {% endif %}
+                </td>
+                <td class="location-col"><div class="details-content">{{ item['location'] }}</div></td>
+                <td class="contact-col"><div class="details-content">{{ item['contact'] }}</div></td>
+                <td class="details-col"><div class="details-content">{{ item['details'] }}</div></td>
+                {% if g.user %}
+                <td>
+                    {% if g.user['username'] == item['owner'] %}
+                        <a href="{{ url_for('edit', item_id=item['id']) }}" class="btn btn-sm btn-secondary">编辑</a>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="关闭">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" class="img-fluid" id="modalImage" alt="物品图片">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+    <script>
+    function filterByMethod(method) {
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const methodCell = row.querySelector('.col-method');
+            let methodText;
+
+            // Check if the cell contains a select element or just text
+            const selectElement = methodCell.querySelector('select');
+            if (selectElement) {
+                methodText = selectElement.value;
+            } else {
+                methodText = methodCell.textContent.trim();
+            }
+
+            if (!method || methodText === method) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+
+    }
+
+    function updateMethod(itemId, method) {
+        fetch('/update_method/' + itemId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'method': method })
+        }).then(response => {
+            if (!response.ok) {
+                console.error('Failed to update method');
+            }
+        });
+    }
+
+    $('#imageModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var imgSrc = button.data('imgsrc'); // Extract info from data-*
+        var modal = $(this);
+        modal.find('.modal-body img').attr('src', imgSrc);
+    });
+</script>
+{% endblock %}

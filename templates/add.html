@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}发布{% endblock %}
+
+{% block content %}
+    <h1>发布</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">物品名称</label>
+            <input type="text" name="name" id="name" class="form-control" required oninput="checkCharCount(this, 20, 'nameCharCount')">
+            <small id="nameCharCount" class="form-text text-muted">字数：0/20</small>
+        </div>
+        <div class="form-group">
+            <label for="method">方式</label>
+            <select name="method" id="method" class="form-control" required>
+                {% for method in sharing_methods %}
+                <option value="{{ method.name }}">{{ method.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="thumbnail">照片</label>
+            <input type="file" name="thumbnail" id="thumbnail" class="form-control-file">
+        </div>
+        <div class="form-group">
+            <label for="location">位置</label>
+            <input type="text" name="location" id="location" class="form-control" oninput="checkCharCount(this, 30, 'locationCharCount')">
+            <small id="locationCharCount" class="form-text text-muted">字数：0/30</small>
+        </div>
+        <div class="form-group">
+            <label for="contact">联系方式</label>
+            <input type="text" name="contact" id="contact" class="form-control" oninput="checkCharCount(this, 30, 'contactCharCount')">
+            <small id="contactCharCount" class="form-text text-muted">字数：0/30</small>
+        </div>
+        <div class="form-group">
+            <label for="details">详情</label>
+            <textarea name="details" id="details" class="form-control" rows="3" oninput="checkCharCount(this, 100, 'charCount')"></textarea>
+            <small id="charCount" class="form-text text-muted">字数：0/100</small>
+        </div>
+        <button type="submit" class="btn btn-primary">发布</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">返回</a>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('details');
+        checkCharCount(textarea, 100, 'charCount');
+        const name = document.getElementById('name');
+        checkCharCount(name, 20, 'nameCharCount');
+        const location = document.getElementById('location');
+        checkCharCount(location, 30, 'locationCharCount');
+        const contact = document.getElementById('contact');
+        checkCharCount(contact, 30, 'contactCharCount');
+    });
+</script>
+{% endblock %}

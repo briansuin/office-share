@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}管理员后台{% endblock %}
+
+{% block content %}
+    <h1>管理员后台</h1>
+
+    <h2>设置</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">注册审批</h5>
+            <p class="card-text">
+                当前状态: <strong>{{ '启用' if registration_approval else '禁用' }}</strong>
+            </p>
+            <p class="card-text">启用后，新用户需要管理员批准才能完成注册。</p>
+            <form action="{{ url_for('toggle_registration_approval') }}" method="post">
+                <button type="submit" class="btn btn-primary">
+                    {{ '禁用' if registration_approval else '启用' }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if unapproved_users %}
+    <h2>待审批用户</h2>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in unapproved_users %}
+            <tr>
+                <td>{{ user['id'] }}</td>
+                <td>{{ user['username'] }}</td>
+                <td>
+                    <form action="{{ url_for('approve_user', user_id=user['id']) }}" method="post" style="display: inline-block;">
+                        <button type="submit" class="btn btn-sm btn-success">批准</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>用户管理</h2>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>管理员</th>
+                <th>已批准</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user['id'] }}</td>
+                <td>{{ user['username'] }}</td>
+                <td>{{ '是' if user['is_admin'] else '否' }}</td>
+                <td>{{ '是' if user['is_approved'] else '否' }}</td>
+                <td>
+                    <a href="{{ url_for('admin_reset_password', user_id=user['id']) }}" class="btn btn-sm btn-warning">重置密码</a>
+                    <form action="{{ url_for('admin_delete_user', user_id=user['id']) }}" method="post" style="display: inline-block;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('您确定要删除此用户吗？');">删除用户</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>物品管理</h2>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>物品名称</th>
+                <th>所有者</th>
+                <th>方式</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item['id'] }}</td>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['owner'] }}</td>
+                <td>{{ item['method'] }}</td>
+                <td>
+                    <a href="{{ url_for('edit', item_id=item['id']) }}" class="btn btn-sm btn-secondary">编辑</a>
+                    <form action="{{ url_for('delete', item_id=item['id']) }}" method="post" style="display: inline-block;">
+                        <input type="hidden" name="next" value="admin_dashboard">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('您确定要删除此项目吗？');">删除</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>分享方式管理</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <form action="{{ url_for('add_sharing_method') }}" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" name="name" class="form-control" placeholder="添加新方式" required>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">添加</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>方式</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for method in sharing_methods %}
+                    <tr>
+                        <td>
+                            <form action="{{ url_for('edit_sharing_method', method_id=method.id) }}" method="post" class="form-inline">
+                                <input type="text" name="name" class="form-control mr-2" value="{{ method.name }}" required>
+                                <button type="submit" class="btn btn-sm btn-secondary">更新</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('delete_sharing_method', method_id=method.id) }}" method="post" style="display: inline-block;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('您确定要删除此方式吗？');">删除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

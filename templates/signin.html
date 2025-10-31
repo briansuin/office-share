@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}登陆{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1>登陆</h1>
+            <form method="post">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" name="username" id="username" class="form-control" required oninput="checkCharCount(this, 20, 'usernameCharCount')">
+            <small id="usernameCharCount" class="form-text text-muted">字数：0/20</small>
+        </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">登陆</button>
+            </form>
+            <p class="mt-3">无账户？ <a href="{{ url_for('signup') }}">注册</a>. <a href="{{ url_for('index') }}">返回</a></p>
+        </div>
+    </div>
+{% endblock %}

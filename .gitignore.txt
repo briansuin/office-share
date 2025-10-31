@@ -1,0 +1,15 @@
+# 忽略Python的虚拟环境
+venv/
+
+# 忽略Python的缓存文件
+__pycache__/
+*.pyc
+
+# 忽略密钥和配置文件
+.env
+
+# 忽略数据库文件
+share.db
+
+# 忽略日志文件
+*.log
