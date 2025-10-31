@@ -1,0 +1,45 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!/MyProject/
+
+# Ignore all top-level directories and files from the home directory
+/.Palantir/
+/.config/
+/.cursor-tutor-1/
+/.cursor-tutor/
+/.cursor/
+/.dbus-keyrings/
+/.gemini/
+/.idlerc/
+/.ipython/
+/.ollama/
+/.smplayer/
+/.vscode/
+/AppData/
+/Contacts/
+/Desktop/
+/Documents/
+/Downloads/
+/Favorites/
+/Git/
+/Links/
+/Music/
+/My Drive/
+/OneDrive/
+/Pictures/
+/Saved Games/
+/Searches/
+/Tracing/
+/Videos/
+/WPS Cloud Files/
+/WPSDrive/
+/NTUSER.DAT
+/ntuser.dat.LOG1
+/ntuser.dat.LOG2
+/NTUSER.DAT{2ad838bc-efea-11ee-a54d-000d3a94eaa1}.TM.blf
+/NTUSER.DAT{2ad838bc-efea-11ee-a54d-000d3a94eaa1}.TMContainer00000000000000000001.regtrans-ms
+/NTUSER.DAT{2ad838bc-efea-11ee-a54d-000d3a94eaa1}.TMContainer00000000000000000002.regtrans-ms
+/ntuser.ini
